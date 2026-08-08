@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Katie Xiong's TechTopia interactive personal portfolio" />
+  <title>TechTopia | Katie Xiong</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header container">
+    <img class="logo" src="assets/techtopia-logo.svg" alt="TechTopia - girl coder logo" />
+    <p class="tagline">Explore. Learn. Create.</p>
+  </header>
+
+  <main class="container dashboard">
+    <section class="card gallery-card" aria-labelledby="galleryTitle">
+      <div class="card-heading">
+        <div><span class="eyebrow">MEMORIES</span><h2 id="galleryTitle">Photo Gallery</h2></div>
+        <span class="chip">Katie's World</span>
+      </div>
+      <div class="filters" role="group" aria-label="Gallery filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="school">School</button>
+        <button class="filter-btn" data-filter="travel">Travel</button>
+        <button class="filter-btn" data-filter="hobbies">Hobbies</button>
+      </div>
+      <div id="galleryGrid" class="gallery-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="card quiz-card" aria-labelledby="quizTitle">
+      <div class="card-heading">
+        <div><span class="eyebrow">CHALLENGE</span><h2 id="quizTitle">Knowledge Quiz</h2></div>
+        <span id="quizScore" class="score-pill">0 / 0</span>
+      </div>
+      <p id="quizProgress" class="muted"></p>
+      <h3 id="quizQuestion">Loading question...</h3>
+      <div id="quizOptions" class="quiz-options"></div>
+      <p id="quizFeedback" class="feedback" aria-live="polite"></p>
+      <div class="button-row">
+        <button id="checkAnswer" class="primary">Check</button>
+        <button id="nextQuestion" class="secondary">Next →</button>
+      </div>
+    </section>
+
+    <section class="card chatbot-card" aria-labelledby="chatTitle">
+      <div class="card-heading">
+        <div><span class="eyebrow">ASK AWAY</span><h2 id="chatTitle">Chat Bot</h2></div>
+        <span class="status-dot">● Online</span>
+      </div>
+      <div id="chatMessages" class="chat-messages" aria-live="polite">
+        <div class="message bot">Hi! I'm Toppy 🤖. Ask me about TechTopia, math, study tips, or Katie's projects.</div>
+      </div>
+      <form id="chatForm" class="chat-form">
+        <input id="chatInput" type="text" placeholder="Type a message..." autocomplete="off" aria-label="Chat message" />
+        <button class="send-btn" type="submit" aria-label="Send message">➤</button>
+      </form>
+    </section>
+
+    <section class="card geometry-card" aria-labelledby="geometryTitle">
+      <div class="card-heading">
+        <div><span class="eyebrow">VISUAL MATH</span><h2 id="geometryTitle">Geometry Visualizer</h2></div>
+        <span class="chip">Circle Lab</span>
+      </div>
+      <canvas id="geometryCanvas" width="600" height="290" aria-label="Interactive circle visualizer"></canvas>
+      <div class="geometry-controls">
+        <label for="radiusInput">Radius <strong id="radiusValue">6</strong></label>
+        <input id="radiusInput" type="range" min="1" max="10" value="6" />
+        <label class="toggle"><input id="roundValues" type="checkbox" checked /> Round answers to 2 decimals</label>
+      </div>
+      <div class="stats-grid">
+        <div><span>Diameter</span><strong id="diameterOutput">12</strong></div>
+        <div><span>Circumference</span><strong id="circumferenceOutput">37.70</strong></div>
+        <div><span>Area</span><strong id="areaOutput">113.10</strong></div>
+      </div>
+    </section>
+
+    <section class="card particle-card" aria-labelledby="particleTitle">
+      <div class="card-heading">
+        <div><span class="eyebrow">PHYSICS PLAYGROUND</span><h2 id="particleTitle">Particle Simulation</h2></div>
+        <span id="particleCountLabel" class="chip">24 particles</span>
+      </div>
+      <div class="simulation-controls">
+        <label>Gravity
+          <select id="gravitySelect">
+            <option value="0.02">Moon</option>
+            <option value="0.08" selected>Earth</option>
+            <option value="0.2">Jupiter</option>
+            <option value="0">Zero-G</option>
+          </select>
+        </label>
+        <label>Particles
+          <input id="particleCount" type="range" min="8" max="60" value="24" />
+        </label>
+        <button id="pauseParticles" class="secondary">Pause</button>
+        <button id="resetParticles" class="secondary">Reset</button>
+      </div>
+      <canvas id="particleCanvas" width="900" height="360" aria-label="Particle gravity simulation"></canvas>
+    </section>
+
+    <section class="utility-grid">
+      <section class="card timer-card" aria-labelledby="timerTitle">
+        <div class="card-heading compact"><div><span class="eyebrow">FOCUS</span><h2 id="timerTitle">Timer</h2></div></div>
+        <div id="timerDisplay" class="timer-display">05:00</div>
+        <div class="button-row centered">
+          <button id="timerStart" class="primary">Start</button>
+          <button id="timerReset" class="secondary">Reset</button>
+          <button id="timerChange" class="secondary">Change Time</button>
+        </div>
+      </section>
+
+      <section class="card homework-card" aria-labelledby="homeworkTitle">
+        <div class="card-heading compact"><div><span class="eyebrow">GET IT DONE</span><h2 id="homeworkTitle">Homework Tracker</h2></div></div>
+        <form id="homeworkForm" class="homework-form">
+          <input id="homeworkInput" type="text" placeholder="Add a homework task..." aria-label="New homework task" />
+          <button class="primary" type="submit">Add</button>
+        </form>
+        <ul id="homeworkList" class="homework-list"></ul>
+        <div class="homework-footer">
+          <span id="homeworkSummary">0 tasks</span>
+          <button id="clearCompleted" class="text-btn">Clear completed</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="container site-footer">
+    <strong>Katie XIONG</strong>
+    <span>Website: TechTopia</span>
+    <span>Built with HTML • CSS • JavaScript</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
