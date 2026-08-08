@@ -284,7 +284,7 @@ body[data-theme="dark"] .score-pill { color: #6ee7b7; }
 .muted { color: var(--muted); margin: 0; font-size: .9rem; }
 
 .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.filter-btn, .secondary, .primary, .send-btn {
+.filter-btn, .level-btn, .secondary, .primary, .send-btn {
   border: 0;
   border-radius: 8px;
   padding: 10px 14px;
@@ -293,6 +293,25 @@ body[data-theme="dark"] .score-pill { color: #6ee7b7; }
 }
 .filter-btn { background: color-mix(in srgb, var(--muted) 10%, var(--surface)); color: var(--muted); }
 .filter-btn:hover, .filter-btn.active { background: var(--ink); color: var(--surface); transform: translateY(-1px); }
+
+.quiz-levels {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 2px 0 14px;
+}
+
+.level-btn {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+}
+
+.level-btn:hover,
+.level-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  transform: translateY(-1px);
+}
 
 .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; min-width: 0; }
 .gallery-item {

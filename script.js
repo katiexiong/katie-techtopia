@@ -58,23 +58,58 @@ document.querySelectorAll(".filter-btn").forEach(btn => btn.addEventListener("cl
 renderGallery();
 
 // -------------------- KNOWLEDGE QUIZ --------------------
-const quiz = [
-  { q: "What is 6 × 6?", options: ["25", "36", "24", "31"], answer: 1 },
-  { q: "A circle has radius 5. What is its diameter?", options: ["2.5", "5", "10", "25"], answer: 2 },
-  { q: "Which number is prime?", options: ["21", "27", "29", "33"], answer: 2 },
-  { q: "What is 3/4 written as a decimal?", options: ["0.34", "0.50", "0.75", "1.25"], answer: 2 },
-  { q: "Solve: x + 7 = 15", options: ["6", "7", "8", "22"], answer: 2 }
-];
+const quizBanks = {
+  easy: [
+    { subject: "Math", q: "A notebook costs $3.75. Katie buys 4 notebooks and pays with a $20 bill. How much change should she get?", options: ["$4.00", "$5.00", "$6.25", "$15.00"], answer: 1 },
+    { subject: "Science", q: "Which statement best explains why the Moon appears to change shape during the month?", options: ["Earth's shadow always covers it", "We see different lit portions as it orbits Earth", "The Moon changes its actual shape", "Clouds block different parts of it"], answer: 1 },
+    { subject: "Geography", q: "Which pair correctly matches a continent with a major desert found there?", options: ["Europe - Sahara", "Asia - Gobi", "South America - Kalahari", "Antarctica - Mojave"], answer: 1 },
+    { subject: "Language Arts", q: "In the sentence 'The careful scientist recorded every result,' what does 'careful' describe?", options: ["Scientist", "Recorded", "Every", "Result"], answer: 0 },
+    { subject: "Coding", q: "If a loop runs while i < 5 and i starts at 1, increasing by 1 each time, how many times does it run?", options: ["3", "4", "5", "6"], answer: 1 },
+    { subject: "History", q: "Why were primary sources useful to historians studying ancient civilizations?", options: ["They are always easier to read", "They come from the time being studied", "They never contain bias", "They summarize every event"], answer: 1 },
+    { subject: "Geometry", q: "A rectangle has length 9 and width 4. What is its perimeter?", options: ["13", "26", "36", "81"], answer: 1 },
+    { subject: "Earth Science", q: "Which process changes liquid water into water vapor?", options: ["Condensation", "Evaporation", "Precipitation", "Erosion"], answer: 1 }
+  ],
+  hard: [
+    { subject: "Math", q: "A recipe uses 2/3 cup of sugar for 12 cookies. How much sugar is needed for 30 cookies?", options: ["1 1/3 cups", "1 2/3 cups", "2 cups", "2 1/2 cups"], answer: 1 },
+    { subject: "Science", q: "A plant is kept near a sunny window but is not watered for two weeks. Which limiting factor most directly slows photosynthesis first?", options: ["Carbon dioxide", "Water", "Soil color", "The plant's shadow"], answer: 1 },
+    { subject: "Geography", q: "Why do many major cities develop near rivers or coasts?", options: ["They never flood", "They provide transportation, trade, and water access", "They are always colder", "They prevent population growth"], answer: 1 },
+    { subject: "Coding", q: "What value does total have after this code: total = 0; for n in [2, 4, 6] { total = total + n / 2 }?", options: ["6", "9", "12", "24"], answer: 0 },
+    { subject: "Geometry", q: "A triangular prism has a triangular base area of 18 square units and a length of 7 units. What is its volume?", options: ["25 cubic units", "63 cubic units", "126 cubic units", "252 cubic units"], answer: 2 },
+    { subject: "History", q: "Which question is best for comparing two civilizations instead of only describing one?", options: ["What crops did one civilization grow?", "How did geography influence trade in both civilizations?", "Who was one famous ruler?", "What year did one city begin?"], answer: 1 },
+    { subject: "Language Arts", q: "Which sentence uses a dependent clause?", options: ["Katie opened her laptop.", "Because the timer rang, everyone looked up.", "The quiz was challenging.", "Stars flashed across the screen."], answer: 1 },
+    { subject: "Data", q: "A data set has values 4, 7, 7, 10, and 12. Which statement is true?", options: ["Mean and median are both 7", "Median is 7 and mean is 8", "Mode is 10", "Range is 6"], answer: 1 },
+    { subject: "Physics", q: "Two balls have the same size, but one has more mass. If the same force pushes each ball, what happens?", options: ["The heavier ball accelerates less", "The heavier ball accelerates more", "Both must accelerate equally", "Neither can move"], answer: 0 },
+    { subject: "Digital Citizenship", q: "Which is the strongest reason to check multiple sources before trusting an online claim?", options: ["More tabs make research faster", "Different sources can reveal errors or bias", "Search engines always rank truth first", "Longer articles are always correct"], answer: 1 }
+  ]
+};
+let quizLevel = localStorage.getItem("techtopiaQuizLevel") || "easy";
+let quiz = quizBanks[quizLevel];
 let quizIndex = 0, quizCorrect = 0, quizAttempts = 0, quizChecked = false;
 const questionEl = document.getElementById("quizQuestion"), optionsEl = document.getElementById("quizOptions"), feedbackEl = document.getElementById("quizFeedback");
 function loadQuestion() {
   quizChecked = false; feedbackEl.textContent = ""; feedbackEl.className = "feedback";
   const item = quiz[quizIndex];
-  document.getElementById("quizProgress").textContent = `Question ${quizIndex + 1} of ${quiz.length}`;
+  document.getElementById("quizProgress").textContent = `${quizLevel[0].toUpperCase() + quizLevel.slice(1)} · ${item.subject} · Question ${quizIndex + 1} of ${quiz.length}`;
   questionEl.textContent = item.q;
   optionsEl.innerHTML = item.options.map((opt, i) => `<label class="option-label"><input type="radio" name="quiz" value="${i}"><span>${String.fromCharCode(65+i)}. ${opt}</span></label>`).join("");
   document.getElementById("quizScore").textContent = `${quizCorrect} / ${quizAttempts}`;
 }
+function setQuizLevel(level) {
+  quizLevel = level;
+  quiz = quizBanks[level];
+  quizIndex = 0;
+  quizCorrect = 0;
+  quizAttempts = 0;
+  quizChecked = false;
+  localStorage.setItem("techtopiaQuizLevel", level);
+  document.querySelectorAll("[data-quiz-level]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.quizLevel === level);
+  });
+  loadQuestion();
+}
+document.querySelectorAll("[data-quiz-level]").forEach(btn => {
+  btn.addEventListener("click", () => setQuizLevel(btn.dataset.quizLevel));
+});
 document.getElementById("checkAnswer").addEventListener("click", () => {
   if (quizChecked) return;
   const chosen = document.querySelector('input[name="quiz"]:checked');
@@ -86,7 +121,7 @@ document.getElementById("checkAnswer").addEventListener("click", () => {
   document.getElementById("quizScore").textContent = `${quizCorrect} / ${quizAttempts}`;
 });
 document.getElementById("nextQuestion").addEventListener("click", () => { quizIndex = (quizIndex + 1) % quiz.length; loadQuestion(); });
-loadQuestion();
+setQuizLevel(quizBanks[quizLevel] ? quizLevel : "easy");
 
 // -------------------- CHAT BOT --------------------
 const chatForm = document.getElementById("chatForm"), chatInput = document.getElementById("chatInput"), chatMessages = document.getElementById("chatMessages");
