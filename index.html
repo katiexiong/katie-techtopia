@@ -7,10 +7,38 @@
   <title>TechTopia | Katie Xiong</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body data-theme="light" data-galaxy="nebula">
+  <div class="cosmos" aria-hidden="true">
+    <span class="shooting-star star-one"></span>
+    <span class="shooting-star star-two"></span>
+    <span class="shooting-star star-three"></span>
+  </div>
+
   <header class="site-header container">
-    <img class="logo" src="assets/techtopia-logo.svg" alt="TechTopia - girl coder logo" />
-    <p class="tagline">Explore. Learn. Create.</p>
+    <div class="brand-lockup">
+      <img class="logo" src="assets/techtopia-logo.svg" alt="TechTopia - girl coder logo" />
+      <p class="tagline">Explore. Learn. Create.</p>
+    </div>
+    <div class="header-panel" aria-label="Profile and galaxy controls">
+      <div class="profile-card">
+        <img class="profile-avatar" src="assets/katie.png" alt="Katie Xiong profile picture" />
+        <div>
+          <span>Creator</span>
+          <strong>Katie Xiong</strong>
+        </div>
+      </div>
+      <div class="theme-toolbar">
+        <div class="theme-modes" role="group" aria-label="Theme mode">
+          <button class="theme-btn active" type="button" data-theme-choice="light">Light</button>
+          <button class="theme-btn" type="button" data-theme-choice="dark">Dark</button>
+        </div>
+        <div class="galaxy-swatches" role="group" aria-label="Galaxy color">
+          <button class="swatch active" type="button" data-galaxy-choice="nebula" aria-label="Nebula galaxy color"></button>
+          <button class="swatch" type="button" data-galaxy-choice="aurora" aria-label="Aurora galaxy color"></button>
+          <button class="swatch" type="button" data-galaxy-choice="supernova" aria-label="Supernova galaxy color"></button>
+        </div>
+      </div>
+    </div>
   </header>
 
   <main class="container dashboard">
@@ -60,18 +88,32 @@
     <section class="card geometry-card" aria-labelledby="geometryTitle">
       <div class="card-heading">
         <div><span class="eyebrow">VISUAL MATH</span><h2 id="geometryTitle">Geometry Visualizer</h2></div>
-        <span class="chip">Circle Lab</span>
+        <span id="shapeLabel" class="chip">Circle Lab</span>
       </div>
-      <canvas id="geometryCanvas" width="600" height="290" aria-label="Interactive circle visualizer"></canvas>
+      <canvas id="geometryCanvas" width="600" height="320" aria-label="Interactive geometry visualizer"></canvas>
       <div class="geometry-controls">
-        <label for="radiusInput">Radius <strong id="radiusValue">6</strong></label>
-        <input id="radiusInput" type="range" min="1" max="10" value="6" />
+        <label for="shapeSelect">Shape</label>
+        <select id="shapeSelect" aria-label="Choose a geometry shape">
+          <option value="circle">Circle</option>
+          <option value="triangle">Triangle</option>
+          <option value="trapezoid">Trapezoid</option>
+          <option value="rectangle">Rectangle</option>
+          <option value="cube">Cube</option>
+          <option value="sphere">Sphere</option>
+          <option value="cylinder">Cylinder</option>
+          <option value="cone">Cone</option>
+          <option value="pyramid">Square Pyramid</option>
+        </select>
+        <label for="sizeInput">Size <strong id="sizeValue">6</strong></label>
+        <input id="sizeInput" type="range" min="1" max="10" value="6" />
+        <label for="heightInput">Height <strong id="heightValue">7</strong></label>
+        <input id="heightInput" type="range" min="1" max="12" value="7" />
         <label class="toggle"><input id="roundValues" type="checkbox" checked /> Round answers to 2 decimals</label>
       </div>
       <div class="stats-grid">
-        <div><span>Diameter</span><strong id="diameterOutput">12</strong></div>
-        <div><span>Circumference</span><strong id="circumferenceOutput">37.70</strong></div>
-        <div><span>Area</span><strong id="areaOutput">113.10</strong></div>
+        <div><span id="metricLabelA">Diameter</span><strong id="metricOutputA">12</strong></div>
+        <div><span id="metricLabelB">Circumference</span><strong id="metricOutputB">37.70</strong></div>
+        <div><span id="metricLabelC">Area</span><strong id="metricOutputC">113.10</strong></div>
       </div>
     </section>
 

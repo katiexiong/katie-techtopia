@@ -1,5 +1,35 @@
 // TechTopia by Katie Xiong — pure HTML/CSS/JavaScript, no libraries required.
 
+// -------------------- GALAXY THEME --------------------
+const savedTheme = localStorage.getItem("techtopiaTheme") || "light";
+const savedGalaxy = localStorage.getItem("techtopiaGalaxy") || "nebula";
+
+function setTheme(theme) {
+  document.body.dataset.theme = theme;
+  localStorage.setItem("techtopiaTheme", theme);
+  document.querySelectorAll("[data-theme-choice]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.themeChoice === theme);
+  });
+  drawGeometry();
+}
+
+function setGalaxy(galaxy) {
+  document.body.dataset.galaxy = galaxy;
+  localStorage.setItem("techtopiaGalaxy", galaxy);
+  document.querySelectorAll("[data-galaxy-choice]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.galaxyChoice === galaxy);
+  });
+  drawGeometry();
+}
+
+document.querySelectorAll("[data-theme-choice]").forEach(btn => {
+  btn.addEventListener("click", () => setTheme(btn.dataset.themeChoice));
+});
+
+document.querySelectorAll("[data-galaxy-choice]").forEach(btn => {
+  btn.addEventListener("click", () => setGalaxy(btn.dataset.galaxyChoice));
+});
+
 // -------------------- PHOTO GALLERY --------------------
 const galleryItems = [
   { title: "Science Fair Day", category: "school", note: "School", bg: "linear-gradient(135deg,#60a5fa,#7c3aed)" },
@@ -66,7 +96,7 @@ function botReply(text) {
   if (t.includes("hello") || t.includes("hi")) return "Hi there! Welcome to TechTopia ✨";
   if (t.includes("katie")) return "Katie Xiong is the creator of this TechTopia portfolio.";
   if (t.includes("math")) return "Try the Knowledge Quiz or Geometry Visualizer. A good math habit is: understand the idea, practice, then explain it back.";
-  if (t.includes("geometry") || t.includes("circle")) return "For a circle: diameter = 2r, circumference = 2πr, and area = πr².";
+  if (t.includes("geometry") || t.includes("circle") || t.includes("shape")) return "The Geometry Visualizer can show circles, triangles, trapezoids, rectangles, cubes, spheres, cylinders, cones, and pyramids.";
   if (t.includes("study") || t.includes("homework")) return "Break your work into small tasks, use the Homework Tracker, then focus with the Timer.";
   if (t.includes("particle") || t.includes("gravity")) return "The particle simulator lets you compare Moon, Earth, Jupiter, and zero gravity.";
   if (t.includes("website") || t.includes("techtopia")) return "TechTopia is Katie's interactive portfolio built with HTML, CSS, and JavaScript.";
@@ -75,23 +105,336 @@ function botReply(text) {
 chatForm.addEventListener("submit", e => { e.preventDefault(); const text = chatInput.value.trim(); if (!text) return; addMessage(text, "user"); chatInput.value = ""; setTimeout(() => addMessage(botReply(text), "bot"), 250); });
 
 // -------------------- GEOMETRY VISUALIZER --------------------
-const gCanvas = document.getElementById("geometryCanvas"), g = gCanvas.getContext("2d"), radiusInput = document.getElementById("radiusInput"), roundValues = document.getElementById("roundValues");
-function formatValue(n) { return roundValues.checked ? n.toFixed(2) : String(n); }
-function drawGeometry() {
-  const r = Number(radiusInput.value), scale = 18, pr = r * scale;
-  g.clearRect(0,0,gCanvas.width,gCanvas.height);
-  const cx = gCanvas.width/2, cy = gCanvas.height/2;
-  const grad = g.createLinearGradient(cx-pr, cy-pr, cx+pr, cy+pr); grad.addColorStop(0,"#c4b5fd"); grad.addColorStop(1,"#7dd3fc");
-  g.beginPath(); g.arc(cx,cy,pr,0,Math.PI*2); g.fillStyle=grad; g.globalAlpha=.42; g.fill(); g.globalAlpha=1; g.lineWidth=4; g.strokeStyle="#6d28d9"; g.stroke();
-  g.beginPath(); g.moveTo(cx,cy); g.lineTo(cx+pr,cy); g.strokeStyle="#ec4899"; g.lineWidth=4; g.stroke();
-  g.fillStyle="#172033"; g.font="700 18px system-ui"; g.fillText(`radius = ${r}`, cx+20, cy-12);
-  g.beginPath(); g.arc(cx,cy,5,0,Math.PI*2); g.fillStyle="#172033"; g.fill();
-  document.getElementById("radiusValue").textContent=r;
-  document.getElementById("diameterOutput").textContent=formatValue(2*r);
-  document.getElementById("circumferenceOutput").textContent=formatValue(2*Math.PI*r);
-  document.getElementById("areaOutput").textContent=formatValue(Math.PI*r*r);
+const gCanvas = document.getElementById("geometryCanvas");
+const g = gCanvas.getContext("2d");
+const shapeSelect = document.getElementById("shapeSelect");
+const sizeInput = document.getElementById("sizeInput");
+const heightInput = document.getElementById("heightInput");
+const roundValues = document.getElementById("roundValues");
+const shapeLabel = document.getElementById("shapeLabel");
+const sizeValue = document.getElementById("sizeValue");
+const heightValue = document.getElementById("heightValue");
+const metricLabels = [
+  document.getElementById("metricLabelA"),
+  document.getElementById("metricLabelB"),
+  document.getElementById("metricLabelC")
+];
+const metricOutputs = [
+  document.getElementById("metricOutputA"),
+  document.getElementById("metricOutputB"),
+  document.getElementById("metricOutputC")
+];
+
+const shapeMeta = {
+  circle: { label: "Circle Lab", size: "Radius", height: "Guide" },
+  triangle: { label: "Triangle Lab", size: "Half base", height: "Height" },
+  trapezoid: { label: "Trapezoid Lab", size: "Top base", height: "Height" },
+  rectangle: { label: "Rectangle Lab", size: "Half width", height: "Height" },
+  cube: { label: "Cube Lab", size: "Side", height: "Tilt" },
+  sphere: { label: "Sphere Lab", size: "Radius", height: "Glow" },
+  cylinder: { label: "Cylinder Lab", size: "Radius", height: "Height" },
+  cone: { label: "Cone Lab", size: "Radius", height: "Height" },
+  pyramid: { label: "Pyramid Lab", size: "Base side", height: "Height" }
+};
+
+function formatValue(n) {
+  return roundValues.checked ? n.toFixed(2) : String(Math.round(n * 10000) / 10000);
 }
-radiusInput.addEventListener("input", drawGeometry); roundValues.addEventListener("change", drawGeometry); drawGeometry();
+
+function cssVar(name) {
+  return getComputedStyle(document.body).getPropertyValue(name).trim();
+}
+
+function setMetrics(items) {
+  items.forEach((item, i) => {
+    metricLabels[i].textContent = item.label;
+    metricOutputs[i].textContent = formatValue(item.value);
+  });
+}
+
+function drawLabel(text, x, y) {
+  g.fillStyle = cssVar("--ink");
+  g.font = "800 17px system-ui";
+  g.fillText(text, x, y);
+}
+
+function drawGalaxyFill(x0, y0, x1, y1) {
+  const grad = g.createLinearGradient(x0, y0, x1, y1);
+  grad.addColorStop(0, cssVar("--accent-3"));
+  grad.addColorStop(.52, cssVar("--accent"));
+  grad.addColorStop(1, cssVar("--accent-2"));
+  return grad;
+}
+
+function prepGeometryCanvas() {
+  g.clearRect(0, 0, gCanvas.width, gCanvas.height);
+  g.save();
+  g.globalAlpha = .18;
+  for (let i = 0; i < 36; i++) {
+    const x = (i * 83) % gCanvas.width;
+    const y = (i * 47) % gCanvas.height;
+    g.beginPath();
+    g.arc(x, y, i % 5 === 0 ? 2.2 : 1.2, 0, Math.PI * 2);
+    g.fillStyle = i % 3 === 0 ? cssVar("--accent-2") : cssVar("--ink");
+    g.fill();
+  }
+  g.restore();
+}
+
+function drawGeometry() {
+  if (!gCanvas || !shapeSelect) return;
+  const shape = shapeSelect.value;
+  const meta = shapeMeta[shape];
+  const size = Number(sizeInput.value);
+  const height = Number(heightInput.value);
+  const cx = gCanvas.width / 2;
+  const cy = gCanvas.height / 2 + 8;
+  const scale = 16;
+  const stroke = cssVar("--accent");
+  const ink = cssVar("--ink");
+  const fill = drawGalaxyFill(120, 36, 500, 280);
+
+  shapeLabel.textContent = meta.label;
+  sizeInput.previousElementSibling.innerHTML = `${meta.size} <strong id="sizeValue">${size}</strong>`;
+  heightInput.previousElementSibling.innerHTML = `${meta.height} <strong id="heightValue">${height}</strong>`;
+  prepGeometryCanvas();
+  g.lineWidth = 4;
+  g.lineJoin = "round";
+  g.lineCap = "round";
+
+  if (shape === "circle") {
+    const r = size * scale;
+    g.beginPath();
+    g.arc(cx, cy, r, 0, Math.PI * 2);
+    g.fillStyle = fill;
+    g.globalAlpha = .46;
+    g.fill();
+    g.globalAlpha = 1;
+    g.strokeStyle = stroke;
+    g.stroke();
+    g.beginPath();
+    g.moveTo(cx, cy);
+    g.lineTo(cx + r, cy);
+    g.strokeStyle = cssVar("--accent-3");
+    g.stroke();
+    g.beginPath();
+    g.arc(cx, cy, 5, 0, Math.PI * 2);
+    g.fillStyle = ink;
+    g.fill();
+    drawLabel(`radius = ${size}`, cx + 18, cy - 10);
+    setMetrics([
+      { label: "Diameter", value: 2 * size },
+      { label: "Circumference", value: 2 * Math.PI * size },
+      { label: "Area", value: Math.PI * size * size }
+    ]);
+  }
+
+  if (shape === "triangle") {
+    const halfBase = size * scale;
+    const h = height * scale;
+    const p1 = [cx, cy - h / 2], p2 = [cx - halfBase, cy + h / 2], p3 = [cx + halfBase, cy + h / 2];
+    g.beginPath();
+    g.moveTo(...p1); g.lineTo(...p2); g.lineTo(...p3); g.closePath();
+    g.fillStyle = fill; g.globalAlpha = .48; g.fill(); g.globalAlpha = 1; g.strokeStyle = stroke; g.stroke();
+    drawLabel(`base = ${size * 2}, height = ${height}`, cx - 92, cy + h / 2 + 28);
+    const side = Math.hypot(size, height);
+    setMetrics([
+      { label: "Base", value: size * 2 },
+      { label: "Perimeter", value: size * 2 + side * 2 },
+      { label: "Area", value: size * height }
+    ]);
+  }
+
+  if (shape === "trapezoid") {
+    const top = size * scale;
+    const bottom = size * 2 * scale;
+    const h = height * scale;
+    const points = [[cx - top / 2, cy - h / 2], [cx + top / 2, cy - h / 2], [cx + bottom / 2, cy + h / 2], [cx - bottom / 2, cy + h / 2]];
+    g.beginPath();
+    points.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y));
+    g.closePath();
+    g.fillStyle = fill; g.globalAlpha = .48; g.fill(); g.globalAlpha = 1; g.strokeStyle = stroke; g.stroke();
+    drawLabel(`top = ${size}, bottom = ${size * 2}`, cx - 94, cy + h / 2 + 28);
+    const leg = Math.hypot(size / 2, height);
+    setMetrics([
+      { label: "Bottom base", value: size * 2 },
+      { label: "Perimeter", value: size + size * 2 + leg * 2 },
+      { label: "Area", value: ((size + size * 2) / 2) * height }
+    ]);
+  }
+
+  if (shape === "rectangle") {
+    const w = size * 2 * scale;
+    const h = height * scale;
+    g.beginPath();
+    g.roundRect(cx - w / 2, cy - h / 2, w, h, 8);
+    g.fillStyle = fill; g.globalAlpha = .48; g.fill(); g.globalAlpha = 1; g.strokeStyle = stroke; g.stroke();
+    drawLabel(`width = ${size * 2}, height = ${height}`, cx - 102, cy + h / 2 + 28);
+    setMetrics([
+      { label: "Width", value: size * 2 },
+      { label: "Perimeter", value: 2 * (size * 2 + height) },
+      { label: "Area", value: size * 2 * height }
+    ]);
+  }
+
+  if (shape === "cube") {
+    const s = size * scale;
+    const offset = Math.max(26, height * 3);
+    drawPrism(cx - s / 2, cy - s / 2 + 16, s, s, offset, fill, stroke);
+    drawLabel(`side = ${size}`, cx - 38, cy + s / 2 + 54);
+    setMetrics([
+      { label: "Surface area", value: 6 * size * size },
+      { label: "Volume", value: size ** 3 },
+      { label: "Space diagonal", value: Math.sqrt(3) * size }
+    ]);
+  }
+
+  if (shape === "sphere") {
+    const r = size * scale;
+    const glow = Math.max(5, height * 2);
+    const sphere = g.createRadialGradient(cx - r / 3, cy - r / 3, glow, cx, cy, r);
+    sphere.addColorStop(0, "#ffffff");
+    sphere.addColorStop(.18, cssVar("--accent-2"));
+    sphere.addColorStop(1, cssVar("--accent"));
+    g.beginPath();
+    g.arc(cx, cy, r, 0, Math.PI * 2);
+    g.fillStyle = sphere;
+    g.globalAlpha = .68;
+    g.fill();
+    g.globalAlpha = 1;
+    g.strokeStyle = stroke;
+    g.stroke();
+    g.beginPath();
+    g.ellipse(cx, cy, r, r / 3, 0, 0, Math.PI * 2);
+    g.strokeStyle = cssVar("--accent-3");
+    g.globalAlpha = .8;
+    g.stroke();
+    g.globalAlpha = 1;
+    drawLabel(`radius = ${size}`, cx - 42, cy + r + 26);
+    setMetrics([
+      { label: "Diameter", value: 2 * size },
+      { label: "Surface area", value: 4 * Math.PI * size * size },
+      { label: "Volume", value: (4 / 3) * Math.PI * size ** 3 }
+    ]);
+  }
+
+  if (shape === "cylinder") {
+    const r = size * scale;
+    const h = height * scale;
+    drawCylinder(cx, cy, r, h, fill, stroke);
+    drawLabel(`radius = ${size}, height = ${height}`, cx - 104, cy + h / 2 + 38);
+    setMetrics([
+      { label: "Diameter", value: 2 * size },
+      { label: "Surface area", value: 2 * Math.PI * size * (size + height) },
+      { label: "Volume", value: Math.PI * size * size * height }
+    ]);
+  }
+
+  if (shape === "cone") {
+    const r = size * scale;
+    const h = height * scale;
+    drawCone(cx, cy, r, h, fill, stroke);
+    const slant = Math.hypot(size, height);
+    drawLabel(`radius = ${size}, height = ${height}`, cx - 104, cy + h / 2 + 38);
+    setMetrics([
+      { label: "Slant height", value: slant },
+      { label: "Surface area", value: Math.PI * size * (size + slant) },
+      { label: "Volume", value: Math.PI * size * size * height / 3 }
+    ]);
+  }
+
+  if (shape === "pyramid") {
+    const base = size * scale * 1.35;
+    const h = height * scale;
+    drawPyramid(cx, cy, base, h, fill, stroke);
+    const slant = Math.hypot(size / 2, height);
+    drawLabel(`base = ${size}, height = ${height}`, cx - 90, cy + h / 2 + 40);
+    setMetrics([
+      { label: "Slant height", value: slant },
+      { label: "Surface area", value: size * size + 2 * size * slant },
+      { label: "Volume", value: size * size * height / 3 }
+    ]);
+  }
+}
+
+function drawPrism(x, y, w, h, offset, fill, stroke) {
+  g.fillStyle = fill;
+  g.globalAlpha = .34;
+  g.fillRect(x, y, w, h);
+  g.globalAlpha = .20;
+  g.beginPath();
+  g.moveTo(x + offset, y - offset); g.lineTo(x + w + offset, y - offset); g.lineTo(x + w + offset, y + h - offset); g.lineTo(x + offset, y + h - offset); g.closePath();
+  g.fill();
+  g.globalAlpha = .52;
+  g.beginPath();
+  g.moveTo(x, y); g.lineTo(x + offset, y - offset); g.lineTo(x + w + offset, y - offset); g.lineTo(x + w, y); g.closePath();
+  g.fill();
+  g.globalAlpha = 1;
+  g.strokeStyle = stroke;
+  g.strokeRect(x, y, w, h);
+  g.beginPath();
+  g.rect(x + offset, y - offset, w, h);
+  g.stroke();
+  [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach(([a, b]) => {
+    g.beginPath(); g.moveTo(a, b); g.lineTo(a + offset, b - offset); g.stroke();
+  });
+}
+
+function drawCylinder(cx, cy, r, h, fill, stroke) {
+  g.fillStyle = fill;
+  g.globalAlpha = .42;
+  g.fillRect(cx - r, cy - h / 2, r * 2, h);
+  g.beginPath(); g.ellipse(cx, cy - h / 2, r, r / 3, 0, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.ellipse(cx, cy + h / 2, r, r / 3, 0, 0, Math.PI * 2); g.fill();
+  g.globalAlpha = 1;
+  g.strokeStyle = stroke;
+  g.beginPath(); g.moveTo(cx - r, cy - h / 2); g.lineTo(cx - r, cy + h / 2); g.moveTo(cx + r, cy - h / 2); g.lineTo(cx + r, cy + h / 2); g.stroke();
+  g.beginPath(); g.ellipse(cx, cy - h / 2, r, r / 3, 0, 0, Math.PI * 2); g.stroke();
+  g.beginPath(); g.ellipse(cx, cy + h / 2, r, r / 3, 0, 0, Math.PI * 2); g.stroke();
+}
+
+function drawCone(cx, cy, r, h, fill, stroke) {
+  g.beginPath();
+  g.moveTo(cx, cy - h / 2);
+  g.lineTo(cx + r, cy + h / 2);
+  g.ellipse(cx, cy + h / 2, r, r / 3, 0, 0, Math.PI);
+  g.lineTo(cx, cy - h / 2);
+  g.closePath();
+  g.fillStyle = fill;
+  g.globalAlpha = .46;
+  g.fill();
+  g.globalAlpha = 1;
+  g.strokeStyle = stroke;
+  g.stroke();
+  g.beginPath();
+  g.ellipse(cx, cy + h / 2, r, r / 3, 0, 0, Math.PI * 2);
+  g.stroke();
+}
+
+function drawPyramid(cx, cy, base, h, fill, stroke) {
+  const top = [cx, cy - h / 2];
+  const left = [cx - base / 2, cy + h / 2];
+  const right = [cx + base / 2, cy + h / 2];
+  const back = [cx + base * .18, cy + h / 2 - base * .30];
+  g.fillStyle = fill;
+  g.globalAlpha = .46;
+  g.beginPath(); g.moveTo(...top); g.lineTo(...left); g.lineTo(...right); g.closePath(); g.fill();
+  g.globalAlpha = .26;
+  g.beginPath(); g.moveTo(...top); g.lineTo(...right); g.lineTo(...back); g.closePath(); g.fill();
+  g.globalAlpha = 1;
+  g.strokeStyle = stroke;
+  g.beginPath();
+  g.moveTo(...top); g.lineTo(...left); g.lineTo(...right); g.lineTo(...back); g.lineTo(...left);
+  g.moveTo(...top); g.lineTo(...right); g.moveTo(...top); g.lineTo(...back);
+  g.stroke();
+}
+
+shapeSelect.addEventListener("change", drawGeometry);
+sizeInput.addEventListener("input", drawGeometry);
+heightInput.addEventListener("input", drawGeometry);
+roundValues.addEventListener("change", drawGeometry);
+setTheme(savedTheme);
+setGalaxy(savedGalaxy);
 
 // -------------------- PARTICLE SIMULATION --------------------
 const pCanvas = document.getElementById("particleCanvas"), p = pCanvas.getContext("2d"), gravitySelect=document.getElementById("gravitySelect"), particleCount=document.getElementById("particleCount");
