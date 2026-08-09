@@ -1,7 +1,7 @@
 // TechTopia by Katie Xiong — pure HTML/CSS/JavaScript, no libraries required.
 
 // -------------------- GALAXY THEME --------------------
-const savedTheme = localStorage.getItem("techtopiaTheme") || "light";
+const savedTheme = localStorage.getItem("techtopiaTheme") || "dark";
 const savedGalaxy = localStorage.getItem("techtopiaGalaxy") || "nebula";
 
 function setTheme(theme) {
